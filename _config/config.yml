@@ -1,0 +1,6 @@
+---
+Name: goldfinch-trademe
+---
+Goldfinch\Trademe\Admin\TrademeAdmin:
+  extensions:
+    - Goldfinch\Helpers\Extensions\BlocksAdminExtension
