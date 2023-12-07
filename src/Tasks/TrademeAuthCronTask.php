@@ -5,7 +5,7 @@ namespace Goldfinch\Trademe\Tasks;
 use Goldfinch\Trademe\Services\Trademe;
 use SilverStripe\CronTask\Interfaces\CronTask;
 
-class TrademeSyncCronTask implements CronTask
+class TrademeAuthCronTask implements CronTask
 {
     /**
      * run this task every 60 minutes
@@ -25,6 +25,6 @@ class TrademeSyncCronTask implements CronTask
     {
         $service = new Trademe;
 
-        // $service->TrademeFeed();
+        $service->TrademeAuth();
     }
 }

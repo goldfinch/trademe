@@ -5,20 +5,20 @@ namespace Goldfinch\Trademe\Tasks;
 use Goldfinch\Trademe\Services\Trademe;
 use SilverStripe\Dev\BuildTask;
 
-class TrademeSyncBuildTask extends BuildTask
+class TrademeAuthBuildTask extends BuildTask
 {
-    private static $segment = 'TrademeSync';
+    private static $segment = 'TrademeAuth';
 
     protected $enabled = true;
 
-    protected $title = 'TradeMe - fetch/sync data';
+    protected $title = 'TradeMe - auth';
 
-    protected $description = 'TradeMe API';
+    protected $description = 'OAuth TradeMe';
 
     public function run($request)
     {
         $service = new Trademe;
 
-        $service->TrademeSync();
+        $service->TrademeAuth();
     }
 }
