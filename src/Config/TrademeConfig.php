@@ -27,6 +27,8 @@ class TrademeConfig extends DataObject implements TemplateGlobalProvider
         'Sandbox' => 'Boolean',
         'ConsumerKey' => EncryptedDBText::class,
         'ConsumerSecret' => EncryptedDBText::class,
+        'Token' => EncryptedDBText::class,
+        'TokenSecret' => EncryptedDBText::class,
     ];
 
     private static $has_one = [
@@ -48,6 +50,8 @@ class TrademeConfig extends DataObject implements TemplateGlobalProvider
           'Sandbox',
           'ConsumerKey',
           'ConsumerSecret',
+          'Token',
+          'TokenSecret',
       ]);
 
       $fields->addFieldsToTab(
@@ -67,6 +71,9 @@ class TrademeConfig extends DataObject implements TemplateGlobalProvider
                   CheckboxField::create('Sandbox', 'Sandbox'),
                   TextField::create('ConsumerKey', 'Consumer Key'),
                   TextField::create('ConsumerSecret', 'Consumer Secret'),
+                  LiteralField::create('TokenHelp', '<a href="https://developer.trademe.co.nz/api-overview/authentication" target="_blank">Generate an access token</a><br/><br/>'),
+                  TextField::create('Token', 'Token'),
+                  TextField::create('TokenSecret', 'Token Secret'),
 
               )->displayIf('TrademeAPI')->isChecked()->end(),
 
