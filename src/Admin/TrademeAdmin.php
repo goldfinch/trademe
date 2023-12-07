@@ -2,25 +2,27 @@
 
 namespace Goldfinch\Trademe\Admin;
 
+use SilverStripe\Admin\ModelAdmin;
+use JonoM\SomeConfig\SomeConfigAdmin;
 use Goldfinch\Trademe\Models\TrademeItem;
 use Goldfinch\Trademe\Blocks\TrademeBlock;
 use Goldfinch\Trademe\Configs\TrademeConfig;
-use SilverStripe\Admin\ModelAdmin;
-use JonoM\SomeConfig\SomeConfigAdmin;
 use SilverStripe\Forms\GridField\GridFieldConfig;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 
 class TrademeAdmin extends ModelAdmin
 {
     use SomeConfigAdmin;
 
     private static $url_segment = 'trademe';
-    private static $menu_title = 'TradeMe';
+    private static $menu_title = 'Trade Me';
     private static $menu_icon_class = 'bi-shop-window';
     // private static $menu_priority = -0.5;
 
     private static $managed_models = [
         TrademeItem::class => [
-            'title'=> 'Questions',
+            'title'=> 'Products',
         ],
         TrademeBlock::class => [
             'title'=> 'Blocks',
@@ -47,7 +49,11 @@ class TrademeAdmin extends ModelAdmin
     {
         $config = parent::getGridFieldConfig();
 
-        // ..
+        if ($this->modelClass == TrademeItem::class)
+        {
+            $config->removeComponentsByType(GridFieldAddNewButton::class);
+            $config->removeComponentsByType(GridFieldEditButton::class);
+        }
 
         return $config;
     }

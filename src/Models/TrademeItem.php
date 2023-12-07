@@ -3,14 +3,27 @@
 namespace Goldfinch\Trademe\Models;
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\View\ArrayData;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 
 class TrademeItem extends DataObject
 {
     private static $table_name = 'TrademeItem';
-    private static $singular_name = 'trademe';
-    private static $plural_name = 'trademes';
+    private static $singular_name = 'product';
+    private static $plural_name = 'products';
 
-    private static $db = [];
+    private static $db = [
+      'ListingID' => 'Varchar',
+      'PublishDate' => 'Datetime',
+      'Data' => JSONText::class,
+    ];
+
+    private static $summary_fields = [
+        'summaryThumbnail' => 'Image',
+        'itemTitle' => 'Title',
+        'itemDescription' => 'Description',
+        'itemDateAgo' => 'Published at',
+    ];
 
     // private static $many_many = [];
     // private static $many_many_extraFields = [];
@@ -23,7 +36,6 @@ class TrademeItem extends DataObject
     // private static $indexes = null;
     // private static $casting = [];
     // private static $defaults = [];
-    // private static $summary_fields = [];
     // private static $field_labels = [];
     // private static $searchable_fields = [];
 
@@ -33,6 +45,43 @@ class TrademeItem extends DataObject
     // * goldfinch/helpers
     private static $field_descriptions = [];
     private static $required_fields = [];
+
+    public function summaryThumbnail()
+    {
+        return '-';
+    }
+
+    public function itemTitle()
+    {
+        return '-';
+    }
+
+    public function itemDescription()
+    {
+        return '-';
+    }
+
+    public function itemDateAgo()
+    {
+        return '-';
+    }
+
+    public function itemImage()
+    {
+        //
+    }
+
+    public function itemLink()
+    {
+        $dr = $this->itemData();
+
+        return 'https://www.trademe.co.nz/....';
+    }
+
+    public function itemData()
+    {
+        return new ArrayData($this->dbObject('Data')->getStoreAsArray());
+    }
 
     public function getCMSFields()
     {
