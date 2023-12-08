@@ -2,9 +2,12 @@
 
 namespace Goldfinch\Trademe\Models;
 
+use Carbon\Carbon;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use PhpTek\JSONText\ORM\FieldType\JSONText;
+use Goldfinch\Trademe\Configs\TrademeConfig;
 
 class TrademeItem extends DataObject
 {
@@ -14,15 +17,20 @@ class TrademeItem extends DataObject
 
     private static $db = [
       'ListingID' => 'Varchar',
-      'PublishDate' => 'Datetime',
+      'StartDate' => 'Datetime',
+      'EndDate' => 'Datetime',
       'Data' => JSONText::class,
+      'Sandbox' => 'Boolean',
     ];
 
     private static $summary_fields = [
         'summaryThumbnail' => 'Image',
         'itemTitle' => 'Title',
-        'itemDescription' => 'Description',
-        'itemDateAgo' => 'Published at',
+        // 'itemDescription' => 'Description',
+        'itemCategory' => 'Category',
+        'itemPrice' => 'Price',
+        'summaryStartDate' => 'Start date',
+        'summaryEndDate' => 'End date',
     ];
 
     // private static $many_many = [];
@@ -48,34 +56,128 @@ class TrademeItem extends DataObject
 
     public function summaryThumbnail()
     {
-        return '-';
+        $img = $this->itemImage();
+
+        $link = '<a onclick="window.open(\''.$this->itemLink().'\');" href="'.$this->itemLink().'" target="_blank">';
+
+        if ($img)
+        {
+            $img = $link . '<img class="action-menu__toggle" src="'. $img. '" alt="Item image" width="250" height="187" style="object-fit: cover" /></a>';
+        }
+        else
+        {
+            $img = $link . '(no image)</a>';
+        }
+
+        $html = DBHTMLText::create();
+        $html->setValue($img);
+
+        return $html;
     }
 
     public function itemTitle()
     {
-        return '-';
+        $dr = $this->itemData();
+
+        return $dr->Title;
+
     }
 
-    public function itemDescription()
+    // public function itemDescription()
+    // {
+    //     $dr = $this->itemData();
+
+    //     return $dr->Title;
+    // }
+
+    public function itemPrice()
     {
-        return '-';
+        $dr = $this->itemData();
+
+        return $dr->PriceDisplay;
     }
 
-    public function itemDateAgo()
+    public function itemCategory()
     {
-        return '-';
+        $dr = $this->itemData();
+
+        return $dr->CategoryName;
+    }
+
+    public function summaryStartDate()
+    {
+        $html = DBHTMLText::create();
+        $str = $this->itemStartDate(). '<br><small>' . $this->itemStartDateAgo() . '</small>';
+        $html->setValue($str);
+
+        return $html;
+    }
+
+    public function summaryEndDate()
+    {
+        $html = DBHTMLText::create();
+        $str = $this->itemEndDate(). '<br><small>' . $this->itemEndDateAgo() . '</small>';
+        $html->setValue($str);
+
+        return $html;
+    }
+
+    public function itemStartDate($format = 'Y-m-d H:i:s')
+    {
+        return Carbon::parse($this->StartDate)->timezone(date_default_timezone_get())->format($format);
+    }
+
+    public function itemEndDate($format = 'Y-m-d H:i:s')
+    {
+        return Carbon::parse($this->EndDate)->timezone(date_default_timezone_get())->format($format);
+    }
+
+    public function itemStartDateAgo()
+    {
+        return Carbon::parse($this->StartDate)->timezone(date_default_timezone_get())->diffForHumans();
+    }
+
+    public function itemEndDateAgo()
+    {
+        return Carbon::parse($this->EndDate)->timezone(date_default_timezone_get())->diffForHumans();
     }
 
     public function itemImage()
     {
-        //
+        $dr = $this->itemData();
+
+        $cfg = TrademeConfig::current_config();
+
+        $return = $dr->PictureHref;
+
+        if($return && is_array(@getimagesize($return)))
+        {
+            return $return;
+        }
+        else if($cfg->DefaultItemImage()->exists())
+        {
+            return $cfg->DefaultItemImage()->getURL();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public function itemLink()
     {
         $dr = $this->itemData();
 
-        return 'https://www.trademe.co.nz/....';
+        if ($this->Sandbox)
+        {
+            $link = 'https://www.tmsandbox.co.nz/';
+        }
+        else
+        {
+            $link = 'https://www.trademe.co.nz/';
+        }
+
+        return $link . '/Browse/Listing.aspx?id=' . $this->ListingID;
     }
 
     public function itemData()

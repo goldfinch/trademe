@@ -59,6 +59,17 @@ class Trademe
                 'consumer_secret' => $this->cfg->dbObject($this->envFields['ConsumerSecret'])->getValue(),
             ],
         ];
+
+        $OAuthToken = $this->cfg->dbObject($this->envFields['OAuthToken'])->getValue();
+        $OAuthTokenSecret = $this->cfg->dbObject($this->envFields['OAuthTokenSecret'])->getValue();
+        $OAuthTokenVerifier = $this->cfg->dbObject($this->envFields['OAuthTokenVerifier'])->getValue();
+
+        if ($OAuthToken && $OAuthTokenSecret && $OAuthTokenVerifier)
+        {
+            $this->trademe['oauth']['token'] = $OAuthToken;
+            $this->trademe['oauth']['token_secret'] = $OAuthTokenSecret;
+            $this->trademe['oauth']['token_verifier'] = $OAuthTokenVerifier;
+        }
     }
 
     public function TrademeAuth()
@@ -121,120 +132,67 @@ class Trademe
         }
     }
 
-    public function TrademeSync()
+    public function getSellingItems()
     {
         $client = new Client($this->trademe);
+
         $params = [];
-        $uri = 'Categories.json';
+        $uri = 'MyTradeMe/SellingItems/All.json?photo_size=FullSize';
+        $list = $client->api('GET', $uri, $params);
 
-        dd($client->api('GET', $uri, $params));
+        return json_decode($list, true);
     }
 
-    // public function TrademeFeed()
-    // {
-    //     if (!$this->cfg->TrademeAPI)
-    //     {
-    //         return;
-    //     }
-
-    //     if (!$this->trademe['api_key'] || !$this->trademe['limit'] || !$this->trademe['channel_id'])
-    //     {
-    //         return $this->returnFailed('Missing configuration', 403);
-    //     }
-
-    //     try {
-    //         $response = $this->client->request('GET', self::TRADEME_API_URL . 'search', [
-    //             'query' => [
-    //                 'channelId' => $this->trademe['channel_id'],
-    //                 'key' => $this->trademe['api_key'],
-    //                 'maxResults' => $this->trademe['limit'],
-    //                 'part' => 'snippet,id',
-    //                 'order' => 'date',
-    //             ],
-    //             'headers' => $this->trademe['headers'],
-    //         ]);
-    //     }
-    //     catch (ClientException $e) {
-    //         $response = $e->getResponse();
-    //     }
-
-    //     if ($response->getStatusCode() >= 200  && $response->getStatusCode() < 300)
-    //     {
-    //         $data = json_decode($response->getBody(), true);
-
-    //         $this->cfg->TrademeAPILastSync = date('Y-m-d H:i:s');
-    //         $this->cfg->write();
-
-    //         // $data['pageInfo']
-    //         // $data['pageInfo']['totalResults]
-    //         // $data['pageInfo']['resultsPerPage]
-    //         // $data['nextPageToken']
-
-    //         foreach ($data['items'] as $item)
-    //         {
-    //             $this->syncPost($item, 'video');
-    //         }
-
-    //         return $this->returnSuccess(true);
-
-    //     }
-    //     else
-    //     {
-    //         return $this->returnFailed($response, $response->getStatusCode());
-    //     }
-    // }
-
-    // private function syncPost($item, $type)
-    // {
-    //     $video = TrademeItem::get()->filter([
-    //       'VideoID' => $item['id']['videoId'],
-    //     ])->first();
-
-    //     if ($video)
-    //     {
-    //         $video->Data = json_encode($item);
-    //         $video->write();
-    //     }
-    //     else
-    //     {
-    //         if ($type == 'video')
-    //         {
-    //             $date = Carbon::parse($item['snippet']['publishedAt']);
-    //         }
-
-    //         $video = new TrademeItem;
-    //         $video->VideoID = $item['id']['videoId'];
-    //         $video->PublishDate = $date->format('Y-m-d H:i:s');
-    //         $video->Data = json_encode($item);
-    //         $video->write();
-    //     }
-    // }
-
-    private function returnSuccess($data = null, $code = 200)
+    public function TrademeSync()
     {
-        print_r([
-            'error' => false,
-            'status_code' => $code,
-            'data' => $data
-        ]);
+        $data = $this->getSellingItems();
+
+        if ($data && $data['TotalCount'] > 0)
+        {
+            foreach ($data['List'] as $listItem)
+            {
+                $item = TrademeItem::get()->filter([
+                  'ListingID' => $listItem['ListingId'],
+                  'Sandbox' => $this->trademe['sandbox'],
+                ])->first();
+
+                $startDate = Carbon::createFromTimestamp((int) substr($listItem['StartDate'], 6, -5));
+                $endDate = Carbon::createFromTimestamp((int) substr($listItem['EndDate'], 6, -5));
+
+                if (!$item)
+                {
+                    $item = new TrademeItem;
+                    $item->ListingID = $listItem['ListingId'];
+                }
+
+                $item->StartDate = $startDate->format('Y-m-d H:i:s');
+                $item->EndDate = $endDate->format('Y-m-d H:i:s');
+                $item->Data = json_encode($listItem);
+                $item->Sandbox = $this->trademe['sandbox'];
+                $item->write();
+            }
+        }
     }
 
-    private function returnFailed($message = null, $code = 500)
+    public function testPlayground()
     {
-        if($message instanceof Response)
-        {
-            $message = json_decode($message->getBody()->getContents())->error->message;
-            $code = 403;
-        }
-        else if(is_object($message))
-        {
-            $code = $message->status();
-        }
+        // $params = [];
+        // $uri = 'Categories.json';
+        // dd($client->api('GET', $uri, $params));
 
-        print_r([
-            'error' => true,
-            'status_code' => $code,
-            'message' => ($message) ? $message['error']['message'] ?? $message : 'Unexpected error occurred'
-        ]);
+        // $params = [
+        //     'Category' => '0010-8849-8850-',
+        //     'Title' => 'TestTitle',
+        //     'Description' => ['TestDescriptionLine1'],
+        //     'Duration' => 2,
+        //     'BuyNowPrice' => 99,
+        //     'StartPrice' => 90,
+        //     'PaymentMethods' => [2, 4],
+        //     'Pickup' => 1,
+        //     'ShippingOptions' => [
+        //         ['Type' => 1],
+        //     ],
+        // ];
+        // dd($client->sellItem($params));
     }
 }

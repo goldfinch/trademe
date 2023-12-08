@@ -3,6 +3,7 @@
 namespace Goldfinch\Trademe\Blocks;
 
 use SilverStripe\Security\Permission;
+use Goldfinch\Trademe\Models\TrademeItem;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use DNADesign\Elemental\Models\BaseElement;
 
@@ -47,6 +48,11 @@ class TrademeBlock extends BaseElement
     // * goldfinch/helpers
     // private static $field_descriptions = [];
     // private static $required_fields = [];
+
+    public function Items($limit)
+    {
+        return TrademeItem::get()->limit($limit);
+    }
 
     public function getCMSFields()
     {
