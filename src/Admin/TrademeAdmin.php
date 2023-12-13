@@ -40,8 +40,11 @@ class TrademeAdmin extends ModelAdmin
     {
         $list = parent::getList();
 
-        $cfg = TrademeConfig::current_config();
-        $list = $list->filter('Sandbox', $cfg->Sandbox);
+        if ($this->modelClass == TrademeItem::class)
+        {
+            $cfg = TrademeConfig::current_config();
+            $list = $list->filter('Sandbox', $cfg->Sandbox);
+        }
 
         return $list;
     }
