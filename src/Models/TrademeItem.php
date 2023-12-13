@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\ArrayData;
 use SilverStripe\ORM\FieldType\DBHTMLText;
-use Goldfinch\JSONEditor\ORM\FieldType\DBJSONText;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 use Goldfinch\Trademe\Configs\TrademeConfig;
 
 class TrademeItem extends DataObject
@@ -19,7 +19,7 @@ class TrademeItem extends DataObject
       'ListingID' => 'Varchar',
       'StartDate' => 'Datetime',
       'EndDate' => 'Datetime',
-      'Data' => DBJSONText::class,
+      'Data' => JSONText::class,
       'Sandbox' => 'Boolean',
     ];
 
