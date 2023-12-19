@@ -119,6 +119,8 @@ class TrademeConfig extends DataObject implements TemplateGlobalProvider
           ]
         );
 
+        $fields->dataFieldByName('DefaultItemImage')->setFolderName('trademe');
+
         // Set Encrypted Data
         $this->nestEncryptedData($fields);
 
