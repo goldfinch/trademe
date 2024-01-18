@@ -2,8 +2,8 @@
 
 namespace Goldfinch\Trademe\Tasks;
 
-use Goldfinch\Trademe\Services\Trademe;
 use SilverStripe\Dev\BuildTask;
+use Goldfinch\Trademe\Services\Trademe;
 
 class TrademeAuthBuildTask extends BuildTask
 {

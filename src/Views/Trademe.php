@@ -3,7 +3,6 @@
 namespace Goldfinch\Trademe\Views;
 
 use SilverStripe\View\ViewableData;
-use SilverStripe\ORM\FieldType\DBHTMLText;
 use Goldfinch\Trademe\Models\TrademeItem;
 use Goldfinch\Trademe\Configs\TrademeConfig;
 

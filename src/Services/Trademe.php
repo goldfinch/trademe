@@ -4,11 +4,9 @@ namespace Goldfinch\Trademe\Services;
 
 use Carbon\Carbon;
 // use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\ClientException;
+use JPCaparas\TradeMeAPI\Client;
 use Goldfinch\Trademe\Models\TrademeItem;
 use Goldfinch\Trademe\Configs\TrademeConfig;
-use JPCaparas\TradeMeAPI\Client;
 
 class Trademe
 {
