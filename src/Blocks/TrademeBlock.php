@@ -11,11 +11,7 @@ class TrademeBlock extends BaseElement
     private static $singular_name = 'Trademe';
     private static $plural_name = 'Trademes';
 
-    private static $db = [
-        // 'BlockTitle' => 'Varchar',
-        // 'BlockSubTitle' => 'Varchar',
-        // 'BlockText' => 'HTMLText',
-    ];
+    private static $db = [];
 
     private static $inline_editable = false;
     private static $description = '';
