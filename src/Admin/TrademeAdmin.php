@@ -22,13 +22,13 @@ class TrademeAdmin extends ModelAdmin
 
     private static $managed_models = [
         TrademeItem::class => [
-            'title'=> 'Products',
+            'title' => 'Products',
         ],
         TrademeBlock::class => [
-            'title'=> 'Blocks',
+            'title' => 'Blocks',
         ],
         TrademeConfig::class => [
-            'title'=> 'Settings',
+            'title' => 'Settings',
         ],
     ];
 
@@ -36,8 +36,7 @@ class TrademeAdmin extends ModelAdmin
     {
         $list = parent::getList();
 
-        if ($this->modelClass == TrademeItem::class)
-        {
+        if ($this->modelClass == TrademeItem::class) {
             $cfg = TrademeConfig::current_config();
             $list = $list->filter('Sandbox', $cfg->Sandbox);
         }
@@ -49,8 +48,7 @@ class TrademeAdmin extends ModelAdmin
     {
         $config = parent::getGridFieldConfig();
 
-        if ($this->modelClass == TrademeItem::class)
-        {
+        if ($this->modelClass == TrademeItem::class) {
             $config->removeComponentsByType(GridFieldAddNewButton::class);
             $config->removeComponentsByType(GridFieldEditButton::class);
         }

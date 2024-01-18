@@ -14,7 +14,7 @@ class TrademeAuthCronTask implements CronTask
      */
     public function getSchedule()
     {
-        return "*/60 * * * *";
+        return '*/60 * * * *';
     }
 
     /**
@@ -23,7 +23,7 @@ class TrademeAuthCronTask implements CronTask
      */
     public function process()
     {
-        $service = new Trademe;
+        $service = new Trademe();
 
         $service->TrademeAuth();
     }

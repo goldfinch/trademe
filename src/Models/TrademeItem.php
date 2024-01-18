@@ -16,11 +16,11 @@ class TrademeItem extends DataObject
     private static $plural_name = 'products';
 
     private static $db = [
-      'ListingID' => 'Varchar',
-      'StartDate' => 'Datetime',
-      'EndDate' => 'Datetime',
-      'Data' => JSONText::class,
-      'Sandbox' => 'Boolean',
+        'ListingID' => 'Varchar',
+        'StartDate' => 'Datetime',
+        'EndDate' => 'Datetime',
+        'Data' => JSONText::class,
+        'Sandbox' => 'Boolean',
     ];
 
     private static $summary_fields = [
@@ -37,14 +37,20 @@ class TrademeItem extends DataObject
     {
         $img = $this->itemImage();
 
-        $link = '<a onclick="window.open(\''.$this->itemLink().'\');" href="'.$this->itemLink().'" target="_blank">';
+        $link =
+            '<a onclick="window.open(\'' .
+            $this->itemLink() .
+            '\');" href="' .
+            $this->itemLink() .
+            '" target="_blank">';
 
-        if ($img)
-        {
-            $img = $link . '<img class="action-menu__toggle" src="'. $img. '" alt="Item image" width="250" height="187" style="object-fit: cover" /></a>';
-        }
-        else
-        {
+        if ($img) {
+            $img =
+                $link .
+                '<img class="action-menu__toggle" src="' .
+                $img .
+                '" alt="Item image" width="250" height="187" style="object-fit: cover" /></a>';
+        } else {
             $img = $link . '(no image)</a>';
         }
 
@@ -59,7 +65,6 @@ class TrademeItem extends DataObject
         $dr = $this->itemData();
 
         return $dr->Title;
-
     }
 
     // public function itemDescription()
@@ -86,7 +91,11 @@ class TrademeItem extends DataObject
     public function summaryStartDate()
     {
         $html = DBHTMLText::create();
-        $str = $this->itemStartDate(). '<br><small>' . $this->itemStartDateAgo() . '</small>';
+        $str =
+            $this->itemStartDate() .
+            '<br><small>' .
+            $this->itemStartDateAgo() .
+            '</small>';
         $html->setValue($str);
 
         return $html;
@@ -95,7 +104,11 @@ class TrademeItem extends DataObject
     public function summaryEndDate()
     {
         $html = DBHTMLText::create();
-        $str = $this->itemEndDate(). '<br><small>' . $this->itemEndDateAgo() . '</small>';
+        $str =
+            $this->itemEndDate() .
+            '<br><small>' .
+            $this->itemEndDateAgo() .
+            '</small>';
         $html->setValue($str);
 
         return $html;
@@ -103,22 +116,30 @@ class TrademeItem extends DataObject
 
     public function itemStartDate($format = 'Y-m-d H:i:s')
     {
-        return Carbon::parse($this->StartDate)->timezone(date_default_timezone_get())->format($format);
+        return Carbon::parse($this->StartDate)
+            ->timezone(date_default_timezone_get())
+            ->format($format);
     }
 
     public function itemEndDate($format = 'Y-m-d H:i:s')
     {
-        return Carbon::parse($this->EndDate)->timezone(date_default_timezone_get())->format($format);
+        return Carbon::parse($this->EndDate)
+            ->timezone(date_default_timezone_get())
+            ->format($format);
     }
 
     public function itemStartDateAgo()
     {
-        return Carbon::parse($this->StartDate)->timezone(date_default_timezone_get())->diffForHumans();
+        return Carbon::parse($this->StartDate)
+            ->timezone(date_default_timezone_get())
+            ->diffForHumans();
     }
 
     public function itemEndDateAgo()
     {
-        return Carbon::parse($this->EndDate)->timezone(date_default_timezone_get())->diffForHumans();
+        return Carbon::parse($this->EndDate)
+            ->timezone(date_default_timezone_get())
+            ->diffForHumans();
     }
 
     public function itemImage()
@@ -129,16 +150,11 @@ class TrademeItem extends DataObject
 
         $return = $dr->PictureHref;
 
-        if($return && is_array(@getimagesize($return)))
-        {
+        if ($return && is_array(@getimagesize($return))) {
             return $return;
-        }
-        else if($cfg->DefaultItemImage()->exists())
-        {
+        } elseif ($cfg->DefaultItemImage()->exists()) {
             return $cfg->DefaultItemImage()->getURL();
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
@@ -147,12 +163,9 @@ class TrademeItem extends DataObject
     {
         $dr = $this->itemData();
 
-        if ($this->Sandbox)
-        {
+        if ($this->Sandbox) {
             $link = 'https://www.tmsandbox.co.nz/';
-        }
-        else
-        {
+        } else {
             $link = 'https://www.trademe.co.nz/';
         }
 

@@ -12,15 +12,13 @@ class TrademeTemplateProvider implements TemplateGlobalProvider
      */
     public static function get_template_global_variables(): array
     {
-        return [
-            'TrademeService'
-        ];
+        return ['TrademeService'];
     }
 
     /**
      * @return boolean
      */
-    public static function TrademeService() : Trademe
+    public static function TrademeService(): Trademe
     {
         return Trademe::create();
     }

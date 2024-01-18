@@ -4,16 +4,13 @@ Name: goldfinch-trademe
 Goldfinch\Trademe\Admin\TrademeAdmin:
   extensions:
     - Goldfinch\Helpers\Extensions\BlocksAdminExtension
-
 ---
 Name: goldfinch-trademe-icon
 Only:
-  moduleexists: 'goldfinch/enchantment'
+  moduleexists: "goldfinch/enchantment"
 ---
-
 Goldfinch\Trademe\Admin\TrademeAdmin:
-  menu_icon_class: 'bi-shop-window'
+  menu_icon_class: "bi-shop-window"
 
 Goldfinch\Trademe\Blocks\TrademeBlock:
-  icon: 'bi-shop-window'
-
+  icon: "bi-shop-window"

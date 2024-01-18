@@ -17,7 +17,7 @@ class TrademeAuthBuildTask extends BuildTask
 
     public function run($request)
     {
-        $service = new Trademe;
+        $service = new Trademe();
 
         $service->TrademeAuth();
     }

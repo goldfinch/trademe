@@ -43,27 +43,42 @@ class Trademe
 
         $this->envFields = [
             'ConsumerKey' => $sandbox ? 'SandboxConsumerKey' : 'ConsumerKey',
-            'ConsumerSecret' => $sandbox ? 'SandboxConsumerSecret' : 'ConsumerSecret',
+            'ConsumerSecret' => $sandbox
+                ? 'SandboxConsumerSecret'
+                : 'ConsumerSecret',
             'OAuthToken' => $sandbox ? 'SandboxOAuthToken' : 'OAuthToken',
-            'OAuthTokenSecret' => $sandbox ? 'SandboxOAuthTokenSecret' : 'OAuthTokenSecret',
-            'OAuthTokenVerifier' => $sandbox ? 'SandboxOAuthTokenVerifier' : 'OAuthTokenVerifier',
+            'OAuthTokenSecret' => $sandbox
+                ? 'SandboxOAuthTokenSecret'
+                : 'OAuthTokenSecret',
+            'OAuthTokenVerifier' => $sandbox
+                ? 'SandboxOAuthTokenVerifier'
+                : 'OAuthTokenVerifier',
             'VerifierURL' => $sandbox ? 'SandboxVerifierURL' : 'VerifierURL',
         ];
 
         $this->trademe = [
             'sandbox' => $sandbox,
             'oauth' => [
-                'consumer_key' => $this->cfg->dbObject($this->envFields['ConsumerKey'])->getValue(),
-                'consumer_secret' => $this->cfg->dbObject($this->envFields['ConsumerSecret'])->getValue(),
+                'consumer_key' => $this->cfg
+                    ->dbObject($this->envFields['ConsumerKey'])
+                    ->getValue(),
+                'consumer_secret' => $this->cfg
+                    ->dbObject($this->envFields['ConsumerSecret'])
+                    ->getValue(),
             ],
         ];
 
-        $OAuthToken = $this->cfg->dbObject($this->envFields['OAuthToken'])->getValue();
-        $OAuthTokenSecret = $this->cfg->dbObject($this->envFields['OAuthTokenSecret'])->getValue();
-        $OAuthTokenVerifier = $this->cfg->dbObject($this->envFields['OAuthTokenVerifier'])->getValue();
+        $OAuthToken = $this->cfg
+            ->dbObject($this->envFields['OAuthToken'])
+            ->getValue();
+        $OAuthTokenSecret = $this->cfg
+            ->dbObject($this->envFields['OAuthTokenSecret'])
+            ->getValue();
+        $OAuthTokenVerifier = $this->cfg
+            ->dbObject($this->envFields['OAuthTokenVerifier'])
+            ->getValue();
 
-        if ($OAuthToken && $OAuthTokenSecret && $OAuthTokenVerifier)
-        {
+        if ($OAuthToken && $OAuthTokenSecret && $OAuthTokenVerifier) {
             $this->trademe['oauth']['token'] = $OAuthToken;
             $this->trademe['oauth']['token_secret'] = $OAuthTokenSecret;
             $this->trademe['oauth']['token_verifier'] = $OAuthTokenVerifier;
@@ -73,59 +88,70 @@ class Trademe
     public function TrademeAuth()
     {
         if (
-          !isset($_GET['oauth_token']) ||
-          !isset($_GET['oauth_verifier']) ||
-          $this->cfg->dbObject($this->envFields['OAuthToken'])->getValue() != $_GET['oauth_token']
-        )
-        {
+            !isset($_GET['oauth_token']) ||
+            !isset($_GET['oauth_verifier']) ||
+            $this->cfg->dbObject($this->envFields['OAuthToken'])->getValue() !=
+                $_GET['oauth_token']
+        ) {
             // 1)
             $data = $this->client->getTemporaryAccessTokens();
 
             $oauth_token = $data['oauth_token'];
             $oauth_token_secret = $data['oauth_token_secret'];
 
-            if (isset($data['oauth_callback_confirmed']) && $data['oauth_callback_confirmed'])
-            {
+            if (
+                isset($data['oauth_callback_confirmed']) &&
+                $data['oauth_callback_confirmed']
+            ) {
                 $this->cfg->{$this->envFields['OAuthToken']} = $oauth_token;
-                $this->cfg->{$this->envFields['OAuthTokenSecret']} = $oauth_token_secret;
-            }
-            else
-            {
+                $this->cfg->{$this->envFields[
+                    'OAuthTokenSecret'
+                ]} = $oauth_token_secret;
+            } else {
                 echo 'Callback not confirmed';
-                exit;
+                exit();
             }
 
             // 2) Visit this URL and store the verifier code
-            $tokenVerifierUrl = $this->client->getAccessTokenVerifierURL($oauth_token);
+            $tokenVerifierUrl = $this->client->getAccessTokenVerifierURL(
+                $oauth_token,
+            );
             $this->cfg->{$this->envFields['OAuthTokenVerifier']} = '';
             $this->cfg->{$this->envFields['VerifierURL']} = $tokenVerifierUrl;
 
             $this->cfg->write();
 
-            echo '<a href="'.$tokenVerifierUrl.'">Click to verify</a>';
-            exit;
-        }
-        else
-        {
+            echo '<a href="' . $tokenVerifierUrl . '">Click to verify</a>';
+            exit();
+        } else {
             // 3)
             $config = [
-              'temp_token' => $this->cfg->dbObject($this->envFields['OAuthToken'])->getValue(),
-              'temp_token_secret' => $this->cfg->dbObject($this->envFields['OAuthTokenSecret'])->getValue(),
-              'token_verifier' => $_GET['oauth_verifier']
+                'temp_token' => $this->cfg
+                    ->dbObject($this->envFields['OAuthToken'])
+                    ->getValue(),
+                'temp_token_secret' => $this->cfg
+                    ->dbObject($this->envFields['OAuthTokenSecret'])
+                    ->getValue(),
+                'token_verifier' => $_GET['oauth_verifier'],
             ];
 
             $final = $this->client->getFinalAccessTokens($config);
 
-            if (isset($final['oauth_token']) && isset($final['oauth_token_secret']))
-            {
-                $this->cfg->{$this->envFields['OAuthToken']} = $final['oauth_token'];
-                $this->cfg->{$this->envFields['OAuthTokenSecret']} = $final['oauth_token_secret'];
-                $this->cfg->{$this->envFields['OAuthTokenVerifier']} = $_GET['oauth_verifier'];
+            if (
+                isset($final['oauth_token']) &&
+                isset($final['oauth_token_secret'])
+            ) {
+                $this->cfg->{$this->envFields['OAuthToken']} =
+                    $final['oauth_token'];
+                $this->cfg->{$this->envFields['OAuthTokenSecret']} =
+                    $final['oauth_token_secret'];
+                $this->cfg->{$this->envFields['OAuthTokenVerifier']} =
+                    $_GET['oauth_verifier'];
                 $this->cfg->{$this->envFields['VerifierURL']} = '';
                 $this->cfg->write();
 
                 echo 'All done';
-                exit;
+                exit();
             }
         }
     }
@@ -145,21 +171,24 @@ class Trademe
     {
         $data = $this->getSellingItems();
 
-        if ($data && $data['TotalCount'] > 0)
-        {
-            foreach ($data['List'] as $listItem)
-            {
-                $item = TrademeItem::get()->filter([
-                  'ListingID' => $listItem['ListingId'],
-                  'Sandbox' => $this->trademe['sandbox'],
-                ])->first();
+        if ($data && $data['TotalCount'] > 0) {
+            foreach ($data['List'] as $listItem) {
+                $item = TrademeItem::get()
+                    ->filter([
+                        'ListingID' => $listItem['ListingId'],
+                        'Sandbox' => $this->trademe['sandbox'],
+                    ])
+                    ->first();
 
-                $startDate = Carbon::createFromTimestamp((int) substr($listItem['StartDate'], 6, -5));
-                $endDate = Carbon::createFromTimestamp((int) substr($listItem['EndDate'], 6, -5));
+                $startDate = Carbon::createFromTimestamp(
+                    (int) substr($listItem['StartDate'], 6, -5),
+                );
+                $endDate = Carbon::createFromTimestamp(
+                    (int) substr($listItem['EndDate'], 6, -5),
+                );
 
-                if (!$item)
-                {
-                    $item = new TrademeItem;
+                if (!$item) {
+                    $item = new TrademeItem();
                     $item->ListingID = $listItem['ListingId'];
                 }
 
