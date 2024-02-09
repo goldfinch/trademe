@@ -4,6 +4,10 @@ Name: goldfinch-trademe
 Goldfinch\Trademe\Admin\TrademeAdmin:
   extensions:
     - Goldfinch\Helpers\Extensions\BlocksAdminExtension
+
+Goldfinch\Trademe\Blocks\TrademeBlock:
+  extensions:
+    - Goldfinch\Helpers\Extensions\BlocksAdminExtension
 ---
 Name: goldfinch-trademe-icon
 Only:
